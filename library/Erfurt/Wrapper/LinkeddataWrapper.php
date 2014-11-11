@@ -43,7 +43,7 @@ class Erfurt_Wrapper_LinkeddataWrapper extends Erfurt_Wrapper
     /**
      * If the location of the data differs from the tested URI, this property
      * contains the current URL.
-     * 
+     *
      * @var string|null
      */
     private $_url = null;
@@ -93,7 +93,7 @@ class Erfurt_Wrapper_LinkeddataWrapper extends Erfurt_Wrapper
             $client = $this->_getHttpClient(
                 $url,
                 array(
-                    'maxredirects'  => 0,
+                    //'maxredirects'  => 0,
                     'timeout'       => 30
                 )
             );
