@@ -121,6 +121,7 @@ class Erfurt_Auth_Adapter_Rdf implements Zend_Auth_Adapter_Interface
                 } else {
                     $identity['uri'] = $this->_users[$this->_username]['userUri'];
                     $identity['email'] = $this->_users[$this->_username]['userEmail'];
+                    $identity['isMemberOf'] = $this->_users[$this->_username]['isMemberOf'];
                     
                     require_once 'Erfurt/Auth/Identity.php';
                     $identityObject = new Erfurt_Auth_Identity($identity);
@@ -185,6 +186,8 @@ class Erfurt_Auth_Adapter_Rdf implements Zend_Auth_Adapter_Interface
                     case $uris['user_mail']:
                         $returnVal['userEmail'] = $userStatement['object'];
                         break;
+                    case $uris['user_ismemberof']:
+                        $returnVal['isMemberOf'] = $userStatement['object'];
                     default:
                         // ignore other statements
                 }
@@ -232,6 +235,9 @@ class Erfurt_Auth_Adapter_Rdf implements Zend_Auth_Adapter_Interface
                 case $uris['user_mail']:
                     // save e-mail
                     $this->_users[$statement['subject']]['userEmail'] = $statement['object'];
+                    break;
+                case $uris['user_ismemberof']:
+                    $this->_users[$statement['subject']]['isMemberOf'] = $statement['object'];
                     break;
                 default:
                     // ignore other statements
@@ -411,11 +417,12 @@ class Erfurt_Auth_Adapter_Rdf implements Zend_Auth_Adapter_Interface
                 'user_class'      => $config->ac->user->class, 
                 'user_username'   => $config->ac->user->name, 
                 'user_password'   => $config->ac->user->pass, 
-                'user_mail'       => $config->ac->user->mail, 
-                'user_superadmin' => $config->ac->user->superAdmin, 
-                'user_anonymous'  => $config->ac->user->anonymousUser, 
-                'action_deny'     => $config->ac->action->deny, 
-                'action_login'    => $config->ac->action->login
+                'user_mail'       => $config->ac->user->mail,
+                'user_ismemberof' => $config->ac->user->isMemberOf,
+                'user_superadmin' => $config->ac->user->superAdmin,
+                'user_anonymous'  => $config->ac->user->anonymousUser,
+                'action_deny'     => $config->ac->action->deny,
+                'action_login'    => $config->ac->action->login,
             );
         }
         

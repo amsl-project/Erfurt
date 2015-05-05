@@ -33,7 +33,8 @@ class Erfurt_Auth_Identity
         $this->_propertyUris['username'] = $config->ac->user->name;
         $this->_propertyUris['email'] = $config->ac->user->mail;
         $this->_propertyUris['label'] = EF_RDFS_LABEL;
-        
+        $this->_propertyUris['isMemberOf'] = $config->ac->user->isMemberOf;
+
         $this->_uri = $userSpec['uri'];
         
         if (isset($userSpec['dbuser'])) {
@@ -70,6 +71,12 @@ class Erfurt_Auth_Identity
         } else {
             $this->_userData[$this->_propertyUris['label']] = '';
         }
+
+        if (isset($userSpec['isMemberOf'])) {
+            $this->_userData[$this->_propertyUris['isMemberOf']] = $userSpec['isMemberOf'];
+        } else {
+            $this->_userData[$this->_propertyUris['isMemberOf']] = '';
+        }
         
         if (isset($userSpec['is_openid_user'])) {
             $this->_isOpenId = true;
@@ -102,6 +109,11 @@ class Erfurt_Auth_Identity
     public function getLabel()
     {
         return $this->_userData[$this->_propertyUris['label']];
+    }
+
+    public function getIsMemberOf()
+    {
+        return $this->_userData[$this->_propertyUris['isMemberOf']];
     }
     
     public function isOpenId()
