@@ -372,6 +372,19 @@ class Erfurt_Wrapper_LinkeddataWrapper extends Erfurt_Wrapper
 
         require_once 'Erfurt/Syntax/RdfParser.php';
         $parser = Erfurt_Syntax_RdfParser::rdfParserWithFormat($type);
+
+        // Start Fehlerbehandlung für lobid.org
+        $doc = new DOMDocument();
+        $doc->loadXML($data);
+        $root = $doc->firstChild->nodeName;
+        if($root == 'docs'){
+            $newDoc = new DOMDocument();
+            $newrootNode = $doc->firstChild->firstChild;
+            $newDoc->appendChild($newDoc->importNode($newrootNode, true));
+            $data = $newDoc->saveXML();
+        }
+        // Ende Fehlerbehandlung für lobid.org
+
         $result = $parser->parse($data, Erfurt_Syntax_RdfParser::LOCATOR_DATASTRING, $baseUri);
         $ns     = $parser->getNamespaces();
 
