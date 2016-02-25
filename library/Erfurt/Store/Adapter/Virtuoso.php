@@ -659,6 +659,40 @@ class Erfurt_Store_Adapter_Virtuoso implements Erfurt_Store_Adapter_Interface, E
         return false;
     }
 
+    private function archiveMode($originalQuery){
+        if(strpos ($originalQuery,'SELECT') == false){
+            return $originalQuery;
+        }
+        $archiveEndpoint = $_SESSION['ONTOWIKI']['archive'];
+        $startWhere = strpos($originalQuery, '{', strpos($originalQuery, 'WHERE') + 5);
+        $startSelect = strpos($originalQuery, 'SELECT') - 1;
+        $endWhere = strripos($originalQuery, '}') + 1;
+        $wherePart = substr($originalQuery, $startWhere, $endWhere-$startWhere);
+        $fullSelectPart = substr($originalQuery, $startSelect, $endWhere-$startSelect);
+        $servicePart = PHP_EOL . '{SERVICE <' . $archiveEndpoint . '> {' . $fullSelectPart . '}}';
+        $localPart = '{' . $wherePart . '}';
+        $start = substr($originalQuery, 0, $startWhere + 1);
+        $end = substr($originalQuery, $endWhere - 1);
+        $federatedQuery = $start . $servicePart . PHP_EOL . 'UNION' . PHP_EOL . $localPart . $end;
+        return $federatedQuery;
+    }
+
+    private function writeArchive($originalQuery){
+        if(strpos ($originalQuery,'CREATE') == false){
+            return $originalQuery;
+        }
+        $archiveEndpoint = $_SESSION['ONTOWIKI']['archive_chron'];
+        $startWhere = strpos($originalQuery, '{', strpos($originalQuery, 'WHERE') + 5);
+        $startSelect = strpos($originalQuery, 'CREATE') - 1;
+        $endWhere = strripos($originalQuery, '}') + 1;
+        $fullSelectPart = substr($originalQuery, $startSelect, $endWhere-$startSelect);
+        $servicePart = PHP_EOL . '{SERVICE <' . $archiveEndpoint . '> {' . $fullSelectPart . '}}';
+        $start = substr($originalQuery, 0, $startWhere + 1);
+        $end = substr($originalQuery, $endWhere - 1);
+        $federatedQuery = $start . $servicePart . $end;
+        return $federatedQuery;
+    }
+
     /**
      * @see Erfurt_Store_Adapter_Interface
      */
@@ -673,8 +707,25 @@ class Erfurt_Store_Adapter_Virtuoso implements Erfurt_Store_Adapter_Interface, E
 
         // prepare query
         $query = $queryPrefix
-               . PHP_EOL
-               . (string)$query;
+            . PHP_EOL
+            . (string)$query;
+
+        if(strpos ($query,'{FILTER(false)}') == false || strpos ($query,'FILTER (false)') == false){
+            $archiveMode = $_SESSION['ONTOWIKI']['archive'];
+            if(isset ($_SESSION['ONTOWIKI']['archive_chron'])) {
+                $archiveChron = $_SESSION['ONTOWIKI']['archive_chron'];
+            }else{
+                $archiveChron = '';
+            }
+
+            if($archiveMode !== '') {
+                $query = $this->ArchiveMode($query);
+            }elseif($archiveChron !== '' && $archiveMode === ''){
+                $query = $this->writeArchive($query);
+            }
+        }
+
+
 
         if ($rid = $this->_execSparql($query)) {
 

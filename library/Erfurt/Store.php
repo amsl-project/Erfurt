@@ -1678,7 +1678,10 @@ if ($options[Erfurt_Store::USE_AC] == false) {
         $queryCache = Erfurt_App::getInstance()->getQueryCache();
 
         $logger->debug('query after rewriting: '.$queryString);
-        if (!isset($options[Erfurt_Store::USE_CACHE]) || $options[Erfurt_Store::USE_CACHE]) {
+        if(!isset($_SESSION['ONTOWIKI']['archive'])){
+            $_SESSION['ONTOWIKI']['archive'] = '';
+        }
+        if ((!isset($options[Erfurt_Store::USE_CACHE]) || $options[Erfurt_Store::USE_CACHE]) && $_SESSION['ONTOWIKI']['archive'] == '') {
             $sparqlResult = $queryCache->load($queryString, $resultFormat);
         } else {
             $sparqlResult = Erfurt_Cache_Frontend_QueryCache::ERFURT_CACHE_NO_HIT;
@@ -1751,7 +1754,9 @@ if ($options[Erfurt_Store::USE_AC] == false) {
             } else {
                 $logger->debug('cached');
             }
-            $queryCache->save($queryString, $resultFormat, $sparqlResult, $duration);
+            if($_SESSION['ONTOWIKI']['archive'] == '') {
+                $queryCache->save($queryString, $resultFormat, $sparqlResult, $duration);
+            }
         }
         return $sparqlResult;
     }
