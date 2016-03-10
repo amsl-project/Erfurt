@@ -1356,8 +1356,29 @@ class Erfurt_Sparql_Parser
         
         while (strtolower(current($this->_tokens)) !== 'limit' && strtolower(current($this->_tokens)) != false
                     && strtolower(current($this->_tokens)) !== 'offset') {
-            
             switch (strtolower(current($this->_tokens))) {
+                case 'ucase':
+                    $val['val'] = $val['val'] . 'ucase';
+                    do {
+                        $this->_fastForward();
+                        $val['val'] .= current($this->_tokens);
+                    } while (current($this->_tokens) !== ')');
+                    $openingBraces = substr_count($val['val'], '(');
+                    for($i = 0; $i < $openingBraces; $i++ ){
+                        $val['val'] .= ')';
+                    }
+                    break;
+                case 'lcase':
+                    $val['val'] .= 'lcase';
+                    do {
+                        $this->_fastForward();
+                        $val['val'] .= current($this->_tokens);
+                    } while (current($this->_tokens) !== ')');
+                    $openingBraces = substr_count($val['val'], '(');
+                    for($i = 1; $i < $openingBraces; $i++ ){
+                        $val['val'] .= ')';
+                    }
+                    break;
                 case 'desc':
                     $this->_fastForward();
                     $this->_fastForward();
@@ -1395,7 +1416,12 @@ class Erfurt_Sparql_Parser
                 case 'asc':
                     $this->_fastForward();
                     $this->_fastForward();
-                    
+
+                    if(strtolower(current($this->_tokens)) === "lcase" || strtolower(current($this->_tokens)) === "ucase"){
+                        $val['val'] = "asc (";
+                        continue;
+                    }
+
                     if ($this->_varCheck(current($this->_tokens))) {
                         $val['val'] = current($this->_tokens);
                     } else if ($this->_iriCheck(current($this->_tokens)) || $this->_qnameCheck(current($this->_tokens)) ||
@@ -1411,15 +1437,15 @@ class Erfurt_Sparql_Parser
                         $val['val'] = $fName;
                     } else {
                         require_once 'Erfurt/Sparql/ParserException.php';
-                        throw new Erfurt_Sparql_ParserException('Variable expected in ORDER BY clause. ', -1, 
+                        throw new Erfurt_Sparql_ParserException('Variable expected in ORDER BY clause. ', -1,
                                         key($this->_tokens));
                     }
                 
                     $this->_fastForward();
-                
+
                     if (current($this->_tokens) !== ')') {
                         require_once 'Erfurt/Sparql/ParserException.php';
-                        throw new Erfurt_Sparql_ParserException('missing ")" in ORDER BY clause.', -1,          
+                        throw new Erfurt_Sparql_ParserException('missing ")" in ORDER BY clause.', -1,
                                         key($this->_tokens));
                     }
                 
