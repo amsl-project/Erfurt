@@ -1382,7 +1382,12 @@ class Erfurt_Sparql_Parser
                 case 'desc':
                     $this->_fastForward();
                     $this->_fastForward();
-                    
+
+                    if(strtolower(current($this->_tokens)) === "lcase" || strtolower(current($this->_tokens)) === "ucase"){
+                        $val['val'] = "asc (";
+                        continue;
+                    }
+
                     if ($this->_varCheck(current($this->_tokens))) {
                         $val['val'] = current($this->_tokens);
                     } else if ($this->_iriCheck(current($this->_tokens)) || $this->_qnameCheck(current($this->_tokens)) ||
