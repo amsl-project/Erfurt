@@ -711,7 +711,10 @@ class Erfurt_Store_Adapter_Virtuoso implements Erfurt_Store_Adapter_Interface, E
             . (string)$query;
 
         if(strpos ($query,'{FILTER(false)}') == false || strpos ($query,'FILTER (false)') == false){
-            $archiveMode = $_SESSION['ONTOWIKI']['archive'];
+            $archiveMode = '';
+            if(isset ($_SESSION['ONTOWIKI']['archive'])) {
+                $archiveMode = $_SESSION['ONTOWIKI']['archive'];
+            }
             if(isset ($_SESSION['ONTOWIKI']['archive_chron'])) {
                 $archiveChron = $_SESSION['ONTOWIKI']['archive_chron'];
             }else{
