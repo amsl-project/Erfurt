@@ -1359,8 +1359,12 @@ class Erfurt_Sparql_Parser
             switch (strtolower(current($this->_tokens))) {
                 case 'ucase':
                     $val['val'] = $val['val'] . 'ucase';
+                    $braceCount = 0;
                     do {
                         $this->_fastForward();
+                        if(current($this->_tokens) === ')'){
+                            $braceCount++;
+                        }
                         $val['val'] .= current($this->_tokens);
                     } while (current($this->_tokens) !== ')');
                     $openingBraces = substr_count($val['val'], '(');
@@ -1370,10 +1374,14 @@ class Erfurt_Sparql_Parser
                     break;
                 case 'lcase':
                     $val['val'] .= 'lcase';
+                    $braceCount = 0;
                     do {
                         $this->_fastForward();
+                        if(current($this->_tokens) === ')'){
+                            $braceCount++;
+                        }
                         $val['val'] .= current($this->_tokens);
-                    } while (current($this->_tokens) !== ')');
+                    } while (current($this->_tokens) !== ')' && $braceCount < 1);
                     $openingBraces = substr_count($val['val'], '(');
                     for($i = 1; $i < $openingBraces; $i++ ){
                         $val['val'] .= ')';

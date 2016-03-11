@@ -79,19 +79,30 @@ class Erfurt_Sparql_Query2_GroupGraphPattern extends Erfurt_Sparql_Query2_Contai
         }
         $this->elements = $new;
         
-        
         //build sparql-string
         $sparql = "{ \n";
+        $optionals = array();
         for ($i=0; $i < $countElements; ++$i) {
-            $sparql .= $this->elements[$i]->getSparql();
+            $spar = $this->elements[$i]->getSparql();
+            if(substr( $spar, 0, 10 ) === "OPTIONAL {"){
+                $optionals[] = $spar;
+            }else {
+                $sparql .= $spar;
 
-            //realisation of TriplesBlock
-            if ($this->elements[$i] instanceof Erfurt_Sparql_Query2_IF_TriplesSameSubject
-                && isset($this->elements[$i+1])
-                && $this->elements[$i+1] instanceof Erfurt_Sparql_Query2_IF_TriplesSameSubject) {
+                //realisation of TriplesBlock
+                if ($this->elements[$i] instanceof Erfurt_Sparql_Query2_IF_TriplesSameSubject
+                    && isset($this->elements[$i + 1])
+                    && $this->elements[$i + 1] instanceof Erfurt_Sparql_Query2_IF_TriplesSameSubject
+                ) {
                     $sparql .= ' .';
-            } 
-            $sparql .= " \n";
+                }else {
+                    $sparql .= " .\n";
+                }
+            }
+        }
+
+        foreach($optionals as $optional){
+            $sparql .= $optional;
         }
         
         

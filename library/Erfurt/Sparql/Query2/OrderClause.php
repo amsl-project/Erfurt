@@ -72,7 +72,7 @@ class Erfurt_Sparql_Query2_OrderClause
         
         $countExps = count($this->exps);
         for ($i = 0; $i < $countExps; ++$i) {
-            $sparql .= ' '.$this->exps[$i]['dir'].' (LCASE(str('.$this->exps[$i]['exp']->getSparql().')))';
+            $sparql .= ' '.$this->exps[$i]['dir'].' (LCASE(IF(!bound('.$this->exps[$i]['exp']->getSparql().'), "", str('.$this->exps[$i]['exp']->getSparql().'))))';
             if ($i < (count($this->exps)-1))
                 $sparql .= ' ';
         }
