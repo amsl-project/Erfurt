@@ -1681,7 +1681,31 @@ if ($options[Erfurt_Store::USE_AC] == false) {
         if(!isset($_SESSION['ONTOWIKI']['archive'])){
             $_SESSION['ONTOWIKI']['archive'] = '';
         }
-        if ((!isset($options[Erfurt_Store::USE_CACHE]) || $options[Erfurt_Store::USE_CACHE]) && $_SESSION['ONTOWIKI']['archive'] == '') {
+
+        // adaptive caching
+        $useCache = true;
+        if($_SESSION['ONTOWIKI']['adaptiveCache'] == 'true') {
+
+            // write log
+            $path = realpath(null) . '/extensions/adaptivecache/resources/store.txt';
+            $queryStringOneLine = trim(str_replace(PHP_EOL, " ", $queryString)) . PHP_EOL;
+            file_put_contents($path,$queryStringOneLine, FILE_APPEND | LOCK_EX);
+
+            // evaluate look-up
+            $useCache = false;
+            $path = realpath(null) . '/extensions/adaptivecache/resources/queries.txt';
+            $handle = fopen($path, "r");
+            while (!feof($handle)) {
+                $line = fgets($handle);
+                if ($line === $queryStringOneLine) {
+                    $useCache = true;
+                    break;
+                }
+            }
+            fclose($handle);
+        }
+
+        if ((!isset($options[Erfurt_Store::USE_CACHE]) || $options[Erfurt_Store::USE_CACHE]) && $_SESSION['ONTOWIKI']['archive'] == '' && $useCache) {
             $sparqlResult = $queryCache->load($queryString, $resultFormat);
         } else {
             $sparqlResult = Erfurt_Cache_Frontend_QueryCache::ERFURT_CACHE_NO_HIT;
