@@ -1357,6 +1357,7 @@ class Erfurt_Sparql_Parser
         while (strtolower(current($this->_tokens)) !== 'limit' && strtolower(current($this->_tokens)) != false
                     && strtolower(current($this->_tokens)) !== 'offset') {
             switch (strtolower(current($this->_tokens))) {
+                
                 case 'ucase':
                     $val['val'] = $val['val'] . 'ucase';
                     $braceCount = 0;
