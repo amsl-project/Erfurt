@@ -130,7 +130,21 @@ class Erfurt_Sparql_SimpleQuery
         );
 
         foreach ($tokens as $key => $pattern) {
-            preg_match_all($pattern, $queryString, $parts[$key]);
+            if ($key !== 'ask') {
+                preg_match_all($pattern, $queryString, $parts[$key]);
+            }else{
+                $queryStringLow = strtolower($queryString);
+                $pos = strpos($queryStringLow, 'where {');
+                if($pos === false){
+                    $pos = strpos($queryStringLow, 'where{');
+                }
+                if($pos === false){
+                    $queryStringLow = $queryString;
+                }else{
+                    $queryStringLow = substr($queryString, 0, $pos);
+                }
+                preg_match_all($pattern, $queryStringLow, $parts[$key]);
+            }
         }
 
         //echo $queryString;
