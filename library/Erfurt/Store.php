@@ -1778,7 +1778,7 @@ if ($options[Erfurt_Store::USE_AC] == false) {
             } else {
                 $logger->debug('cached');
             }
-            if($_SESSION['ONTOWIKI']['archive'] == '') {
+            if($_SESSION['ONTOWIKI']['archive'] == '' && $useCache) {
                 $queryCache->save($queryString, $resultFormat, $sparqlResult, $duration);
             }
         }

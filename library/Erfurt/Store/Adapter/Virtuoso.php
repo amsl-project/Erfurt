@@ -741,20 +741,22 @@ class Erfurt_Store_Adapter_Virtuoso implements Erfurt_Store_Adapter_Interface, E
             }
 
             // convert XML result
-            if (null !== $converter) {
-                foreach ((array) $converter as $currentConverter) {
-                    $converterClass = 'Erfurt_Store_Adapter_Virtuoso_ResultConverter_' . $currentConverter;
+            if(!(isset($options["jsonEncode"]) && isset($options["result_format"]) && $options["jsonEncode"] === "true" && $options["result_format"] === "extended")) {
+                if (null !== $converter) {
+                    foreach ((array)$converter as $currentConverter) {
+                        $converterClass = 'Erfurt_Store_Adapter_Virtuoso_ResultConverter_' . $currentConverter;
 
-                    require_once str_replace('_', '/', $converterClass) . '.php';
-                    $converter = new $converterClass();
-                    $result = $converter->convert($result);
+                        require_once str_replace('_', '/', $converterClass) . '.php';
+                        $converter = new $converterClass();
+                        $result = $converter->convert($result);
+                    }
                 }
             }
 
             // encode as JSON string
-            if ($jsonEncode) {
-                $result = json_encode($result);
-            }
+//            if ($jsonEncode) {
+//                $result = json_encode($result);
+//            }
 
             odbc_free_result($rid);
 
@@ -1013,12 +1015,45 @@ class Erfurt_Store_Adapter_Virtuoso implements Erfurt_Store_Adapter_Interface, E
                         FILTER (' . implode(' || ', $filter) . ')
                     }';
 
-                $result = $queryCache->load($query, Erfurt_Store::RESULTFORMAT_PLAIN);
+
+                // adaptive caching
+                if(!isset($_SESSION['ONTOWIKI']['archive'])){
+                    $_SESSION['ONTOWIKI']['archive'] = '';
+                }
+                $useCache = true;
+                if($_SESSION['ONTOWIKI']['adaptiveCache'] == 'true') {
+
+                    // write log
+                    $path = realpath(null) . '/extensions/adaptivecache/resources/store.txt';
+                    $queryStringOneLine = trim(str_replace(PHP_EOL, " ", $query)) . PHP_EOL;
+                    file_put_contents($path,$queryStringOneLine, FILE_APPEND | LOCK_EX);
+
+                    // evaluate look-up
+                    $useCache = false;
+                    $path = realpath(null) . '/extensions/adaptivecache/resources/queries.txt';
+                    $handle = fopen($path, "r");
+                    while (!feof($handle)) {
+                        $line = fgets($handle);
+                        if ($line === $queryStringOneLine) {
+                            $useCache = true;
+                            break;
+                        }
+                    }
+                    fclose($handle);
+                }
+                if($_SESSION['ONTOWIKI']['archive'] == '' && $useCache) {
+                    $result = $queryCache->load($query, Erfurt_Store::RESULTFORMAT_PLAIN);
+                }else{
+                    $result = Erfurt_Cache_Frontend_QueryCache::ERFURT_CACHE_NO_HIT;
+                }
                 if ($result == Erfurt_Cache_Frontend_QueryCache::ERFURT_CACHE_NO_HIT) {
                     $startTime = microtime(true);
                     $result = $this->sparqlQuery($query);
                     $duration = microtime(true) - $startTime;
-                    $queryCache->save($query, Erfurt_Store::RESULTFORMAT_PLAIN, $result, $duration);
+                    if($_SESSION['ONTOWIKI']['archive'] == '' && $useCache) {
+                        $queryCache->save($query, Erfurt_Store::RESULTFORMAT_PLAIN, $result, $duration);
+                    }
+
                 }
             } while ($result);
 
