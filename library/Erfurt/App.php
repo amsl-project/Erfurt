@@ -620,10 +620,13 @@ class Erfurt_App
             $options	= $this->getConfig()->cache->frontend->toArray();
             $options['automatic_serialization']	= TRUE;
             if (!isset($options['lifetime']) || ((int)$options['lifetime'] < 1 )) {
-                $options['lifetime']	= NULL;
+                $options['lifetime']	= 3600;
             }
             $this->_cache = new Erfurt_Cache_Frontend_ObjectCache($options);
+
             $this->_cache->setBackend($this->_getCacheBackend());
+        }else{
+            $this->_cache->setLifetime(3600);
         }
         return $this->_cache;
     }
