@@ -616,8 +616,8 @@ class Erfurt_Ac_Default
                     'WHERE {
                                 ?s ?p ?o . 
                                 FILTER (
-                                    sameTerm(?s, <' . $userURI . '>) ||
-                                    sameTerm(?o, <' . $this->_config->ac->action->class . '>)
+                                    ?s = <' . $userURI . '> ||
+                                    ?o = <' . $this->_config->ac->action->class . '>
                                 )
                             }'
                 );
