@@ -883,6 +883,10 @@ class Erfurt_Sparql_Query2 //extends Erfurt_Sparql_Query2_ContainerHelper
         return $this->order;
     }
     
+    public function setOrder(Erfurt_Sparql_Query2_OrderClause $order) {
+        $this->order = $order;
+    }
+    
     /**
      * getVar
      * a factory method that either instantiates a var with the given name
