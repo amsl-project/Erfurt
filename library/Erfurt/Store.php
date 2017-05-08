@@ -1500,12 +1500,12 @@ EOF;
             );
         }
 
-        /*
-if ($options[Erfurt_Store::USE_AC] == false) {
+        
+        if ($options[Erfurt_Store::USE_AC] == false) {
             //we are done preparing early
-            return $queryObject;
+            return $queryObject->__toString();
         }
-*/
+
 
         $logger = $this->_getQueryLogger();
 
