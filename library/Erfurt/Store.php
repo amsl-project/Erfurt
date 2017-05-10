@@ -1774,13 +1774,12 @@ EOF;
                         ' msec ' . $slow . PHP_EOL . $q . PHP_EOL . $additionalInfo
                     );
                 }
-
-            } else {
-                $logger->debug('cached');
-            }
+            } 
             if($_SESSION['ONTOWIKI']['archive'] == '' && $useCache) {
                 $queryCache->save($queryString, $resultFormat, $sparqlResult, $duration);
             }
+        } else {
+            $logger->debug('cached');
         }
         return $sparqlResult;
     }
