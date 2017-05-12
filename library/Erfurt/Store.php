@@ -2185,17 +2185,17 @@ EOF;
         // overwrite result format
         $options[Erfurt_Store::RESULTFORMAT] = Erfurt_Store::RESULTFORMAT_EXTENDED;
 
-        $memoryModel = new Erfurt_Rdf_MemoryModel();
-
         $query = new Erfurt_Sparql_SimpleQuery();
         $query->setProloguePart('SELECT ?p ?o')
-            ->setWherePart("{<$resourceIri> ?p ?o . }");
+            ->setWherePart("{<$resourceIri> ?p ?o . }")
+            ->setLimit(20);
 
         // prepare an additional query for inverse properties
         if (isset($options['fetchInverse']) && $options['fetchInverse'] === true) {
             $inverseQuery = new Erfurt_Sparql_SimpleQuery();
             $inverseQuery->setProloguePart('SELECT ?s ?p')
-                ->setWherePart("{?s ?p <$resourceIri> . }");
+                ->setWherePart("{?s ?p <$resourceIri> . }")
+                ->setLimit(20);
         } else {
             $inverseQuery = false;
         }
@@ -2227,6 +2227,7 @@ EOF;
             }
         }
 
+        $memoryModel = new Erfurt_Rdf_MemoryModel();
         if ($result) {
             foreach ($result['results']['bindings'] as $row) {
                 // fake the subject array
