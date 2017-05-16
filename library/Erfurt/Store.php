@@ -1500,34 +1500,28 @@ EOF;
             );
         }
 
-        
-        if ($options[Erfurt_Store::USE_AC] == false) {
-            //we are done preparing early
-            return $queryObject->__toString();
-        }
-
-
         $logger = $this->_getQueryLogger();
-
         $noBindings = false;
 
         //get available models (readable)
-        $available = array();
         if ($options[Erfurt_Store::USE_AC] === true) {
             $logger->debug('AC: use ac ');
-
             $availablepre = $this->getAvailableModels(true); //all readable (with ac)
-            foreach ($availablepre as $key => $true) {
-                $available[] = array('uri' => $key, 'named' => false);
-            }
         } else {
             $logger->debug('AC: dont use ac ');
 
-            $allpre = $this->_backendAdapter->getAvailableModels(); //really all (without ac)
-            foreach ($allpre as $key => $true) {
-                $available[] = array('uri' => $key, 'named' => false);
+            if ($options[Erfurt_Store::USE_OWL_IMPORTS] === false) {
+                //stop here if no ac and imports are used
+                return $queryObject->__toString();
             }
+            $availablepre= $this->_backendAdapter->getAvailableModels(); //really all (without ac)
         }
+        
+        $available = array();
+        foreach ($availablepre as $key => $true) {
+            $available[] = array('uri' => $key, 'named' => false);
+        }
+        
         $logger->debug('AC: available models ' . $this->toStr($available));
 
         // examine froms (for access control and imports) in 5 steps
