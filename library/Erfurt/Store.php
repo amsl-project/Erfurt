@@ -2182,14 +2182,14 @@ EOF;
         $query = new Erfurt_Sparql_SimpleQuery();
         $query->setProloguePart('SELECT ?p ?o')
             ->setWherePart("{<$resourceIri> ?p ?o . }")
-            ->setLimit(20);
+            ->setLimit(70);
 
         // prepare an additional query for inverse properties
         if (isset($options['fetchInverse']) && $options['fetchInverse'] === true) {
             $inverseQuery = new Erfurt_Sparql_SimpleQuery();
             $inverseQuery->setProloguePart('SELECT ?s ?p')
                 ->setWherePart("{?s ?p <$resourceIri> . }")
-                ->setLimit(20);
+                ->setLimit(70);
         } else {
             $inverseQuery = false;
         }
