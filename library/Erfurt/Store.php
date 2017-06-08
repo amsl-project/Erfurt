@@ -1745,7 +1745,7 @@ EOF;
             if (defined('_EFDEBUG')) {
                 $isSlow = true;
 
-                if ($duration > 1) {
+                if ($duration > 0.5) {
                     $slow = ' WARNING SLOW ';
                     $isSlow = true;
                 } else {
