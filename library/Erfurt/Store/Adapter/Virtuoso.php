@@ -878,30 +878,30 @@ class Erfurt_Store_Adapter_Virtuoso implements Erfurt_Store_Adapter_Interface, E
      */
     public function buildTriple(array $rdfPhpStatements, $callback)
     {
-        foreach ($rdfPhpStatements as $currentSubject => $predicates) {
-            foreach ($predicates as $currentPredicate => $objects) {
-                foreach ($objects as $currentObject) {
-                    // TODO: blank nodes
-                    $resource = '<' . trim($currentSubject) . '>';
-                    $property = '<' . trim($currentPredicate) . '>';
-
-                    if ($currentObject['type'] == 'uri') {
-                        $value = '<' . $currentObject['value'] . '>';
-                    } else {
-                        $value = $this->buildLiteralString(
-                            $currentObject['value'],
-                            array_key_exists('datatype', $currentObject) ? $currentObject['datatype'] : null,
-                            array_key_exists('lang', $currentObject) ? $currentObject['lang'] : null
-                        );
-                    }
-
-                    // add triple
-                    $callback(sprintf('%s %s %s .%s', $resource, $property, $value, PHP_EOL));
-                }
-            }
-        }
+    	foreach ($rdfPhpStatements as $currentSubject => $predicates) {
+    		foreach ($predicates as $currentPredicate => $objects) {
+    			foreach ($objects as $currentObject) {
+    				// TODO: blank nodes
+    				$resource = '<' . trim($currentSubject) . '>';
+    				$property = '<' . trim($currentPredicate) . '>';
+    				
+    				if ($currentObject['type'] == 'uri') {
+    					$value = '<' . $currentObject['value'] . '>';
+    				} else {
+    					$value = $this->buildLiteralString(
+    							$currentObject['value'],
+    							array_key_exists('datatype', $currentObject) ? $currentObject['datatype'] : null,
+    							$this->getLang($currentObject)
+    							);
+    				}
+    				
+    				// add triple
+    				$callback(sprintf('%s %s %s .%s', $resource, $property, $value, PHP_EOL));
+    			}
+    		}
+    	}
     }
-
+    
     /**
      * Builds an array of triples in N-Triples syntax out of an RDF/PHP array.
      *
@@ -940,6 +940,21 @@ class Erfurt_Store_Adapter_Virtuoso implements Erfurt_Store_Adapter_Interface, E
         );
 
         return $triples;
+    }
+    
+    /**
+     * Extracts lang from given object, specified by key 'lang' or 'xml:lang'
+     * @param $obj
+     * @return language tag, if provided in map
+     */
+    public function getLang($obj) {
+    	if (array_key_exists('lang', $obj)) {
+    		return $obj['lang'];
+    	}
+    	if (array_key_exists('xml:lang', $obj)) {
+    		return $obj['xml:lang'];
+    	}
+    	return null;
     }
 
     /**
