@@ -1134,7 +1134,7 @@ class Erfurt_Store_Adapter_Virtuoso implements Erfurt_Store_Adapter_Interface, E
      * @return ODBC result identifier
      * @throws Erfurt_Store_Adapter_Exception
      */
-    private function _execSparql($sparqlQuery, $graphUri = null)
+    public function _execSparql($sparqlQuery, $graphUri = null)
     {
         $graphUri = (string)$graphUri;
 
