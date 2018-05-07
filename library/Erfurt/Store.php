@@ -1667,9 +1667,10 @@ EOF;
         $queryString = $this->_prepareQuery($queryObject, $options);
         //dont use the query object afterwards anymore - only the string
 
+        // disabled due to bug with sorting
         // wrap query into a subquery if it contains the LIMIT xx OFFSET xx clause
         // see https://virtuoso.openlinksw.com/dataspace/doc/dav/wiki/Main/VirtTipsAndTricksHowToHandleBandwidthLimitExceed
-        if (preg_match("/(.*)(LIMIT [0-9]*..OFFSET [0-9]*)/s", $queryString, $matches) === 1) {
+        /* if (preg_match("/(.*)(LIMIT [0-9]*..OFFSET [0-9]*)/s", $queryString, $matches) === 1) {
             preg_match("/(SELECT.*?)(FROM|WHERE)/s", $queryString, $matches2);
             if (isset($matches2[1]) && isset($matches[1]) && isset($matches[2])) {
                 $logger->debug("Query contains 'LIMIT xx OFFSET xx': Wrapping query into subquery.");
@@ -1677,7 +1678,7 @@ EOF;
             } else {
                 $logger->warn("Could not wrap query into subquery." + $queryString);
             }
-        }
+        } */
         
         //querying SparqlEngine or retrieving Result from QueryCache
         $resultFormat = $options[Erfurt_Store::RESULTFORMAT];
