@@ -2194,15 +2194,15 @@ EOF;
 
         $query = new Erfurt_Sparql_SimpleQuery();
         $query->setProloguePart('SELECT ?p ?o')
-            ->setWherePart("{<$resourceIri> ?p ?o . }")
-            ->setLimit(70);
-
+            ->setWherePart("{ {<$resourceIri> ?p ?o . FILTER (?p != <http://vocab.ub.uni-leipzig.de/amsl/tipp>)} UNION {
+                SELECT <http://vocab.ub.uni-leipzig.de/amsl/tipp> as ?p ?o WHERE { <$resourceIri> <http://vocab.ub.uni-leipzig.de/amsl/tipp> ?o} LIMIT 5} }");
+        
         // prepare an additional query for inverse properties
         if (isset($options['fetchInverse']) && $options['fetchInverse'] === true) {
             $inverseQuery = new Erfurt_Sparql_SimpleQuery();
             $inverseQuery->setProloguePart('SELECT ?s ?p')
-                ->setWherePart("{?s ?p <$resourceIri> . }")
-                ->setLimit(70);
+            ->setWherePart("{ {<$resourceIri> ?p ?o . FILTER (?p != <http://vocab.ub.uni-leipzig.de/amsl/tipp>)} UNION {
+                SELECT <http://vocab.ub.uni-leipzig.de/amsl/tipp> as ?p ?o WHERE { <$resourceIri> <http://vocab.ub.uni-leipzig.de/amsl/tipp> ?o} LIMIT 5} }");
         } else {
             $inverseQuery = false;
         }
@@ -2227,6 +2227,7 @@ EOF;
                 $result = false;
             } else {
                 // use model query method if model valid and readable
+                $queryString = $query->__toString();
                 $result = $model->sparqlQuery($query, $options);
                 if ($inverseQuery) {
                     $inverseResult = $model->sparqlQuery($inverseQuery, $options);
